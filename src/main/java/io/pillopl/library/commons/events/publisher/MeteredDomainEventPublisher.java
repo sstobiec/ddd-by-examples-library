@@ -6,6 +6,10 @@ import io.pillopl.library.commons.events.DomainEvents;
 import lombok.AllArgsConstructor;
 
 
+/**
+ * Decorator for {@link DomainEvents} that adds metrics recording.
+ * Counts the number of published events, tagged by event type.
+ */
 @AllArgsConstructor
 public class MeteredDomainEventPublisher implements DomainEvents {
 
@@ -15,6 +19,11 @@ public class MeteredDomainEventPublisher implements DomainEvents {
     private final DomainEvents delegate;
     private final MeterRegistry metricsRegistry;
 
+    /**
+     * Publishes the event via the delegate and increments the event counter.
+     *
+     * @param event the domain event to publish
+     */
     @Override
     public void publish(DomainEvent event) {
         delegate.publish(event);

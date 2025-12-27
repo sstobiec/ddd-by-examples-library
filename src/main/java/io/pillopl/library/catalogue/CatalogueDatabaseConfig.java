@@ -12,24 +12,54 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
+/**
+ * Database configuration for the Catalogue module.
+ * <p>
+ * This class sets up the embedded H2 database, JDBC templates, and transaction management
+ * specifically for the catalogue.
+ * </p>
+ */
 @Configuration
 class CatalogueDatabaseConfig {
 
+    /**
+     * Configures the JdbcTemplate.
+     *
+     * @return the JdbcTemplate.
+     */
     @Bean
     JdbcTemplate jdbcTemplate() {
         return new JdbcTemplate(dataSource());
     }
 
+    /**
+     * Configures NamedParameterJdbcOperations.
+     *
+     * @return the NamedParameterJdbcTemplate.
+     */
     @Bean
     NamedParameterJdbcOperations operations() {
         return new NamedParameterJdbcTemplate(dataSource());
     }
 
+    /**
+     * Configures the transaction manager.
+     *
+     * @return the DataSourceTransactionManager.
+     */
     @Bean
     PlatformTransactionManager transactionManager() {
         return new DataSourceTransactionManager(dataSource());
     }
 
+    /**
+     * Configures the embedded H2 data source.
+     * <p>
+     * Initializes the database schema using 'create_catalogue_book.sql'.
+     * </p>
+     *
+     * @return the configured DataSource.
+     */
     @Bean
     DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()

@@ -17,6 +17,13 @@ import static io.pillopl.library.lending.librarybranch.model.LibraryBranchFixtur
 import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 
 @SpringBootTest(classes = LendingTestContext.class)
+/**
+ * Integration test for the {@link BookDatabaseRepository}.
+ * <p>
+ * Verifies that {@link AvailableBook} entities can be correctly persisted to the real database
+ * and retrieved with the correct type.
+ * </p>
+ */
 class BookDatabaseRepositoryIT extends Specification {
 
     BookId bookId = anyBookId()
@@ -26,6 +33,9 @@ class BookDatabaseRepositoryIT extends Specification {
     @Autowired
     BookDatabaseRepository bookEntityRepository
 
+    /**
+     * Verifies persistence of an AvailableBook.
+     */
     def 'persistence in real database should work'() {
         given:
             AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)

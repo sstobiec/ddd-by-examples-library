@@ -21,6 +21,13 @@ import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHo
 import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 
 @SpringBootTest(classes = LendingTestContext.class)
+/**
+ * Integration test for finding available books in the database.
+ * <p>
+ * Verifies the {@link BookDatabaseRepository#findAvailableBookBy(BookId)} method.
+ * Ensures that books are only returned as available when they are not on hold or checked out.
+ * </p>
+ */
 class FindAvailableBookInDatabaseIT extends Specification {
 
     BookId bookId = anyBookId()
@@ -30,6 +37,9 @@ class FindAvailableBookInDatabaseIT extends Specification {
     @Autowired
     BookDatabaseRepository bookEntityRepository
 
+    /**
+     * Verifies that a book is found as available initially, but not after being placed on hold.
+     */
     def 'should find available book in database'() {
         given:
             AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)

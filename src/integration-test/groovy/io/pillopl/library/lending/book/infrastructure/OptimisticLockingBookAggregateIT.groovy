@@ -24,6 +24,13 @@ import static io.pillopl.library.lending.patron.model.PatronEvent.BookPlacedOnHo
 import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 
 @SpringBootTest(classes = LendingTestContext.class)
+/**
+ * Integration test verifying optimistic locking for the Book aggregate.
+ * <p>
+ * Ensures that concurrent modifications to the same {@link Book} aggregate are detected
+ * and handled correctly using optimistic locking (versioning).
+ * </p>
+ */
 class OptimisticLockingBookAggregateIT extends Specification {
 
     BookId bookId = anyBookId()
@@ -33,6 +40,16 @@ class OptimisticLockingBookAggregateIT extends Specification {
     @Autowired
     BookDatabaseRepository bookEntityRepository
 
+    /**
+     * Verifies that saving a stale aggregate throws an exception.
+     * <p>
+     * Scenario:
+     * 1. A book is loaded.
+     * 2. The book is modified and saved by another process (simulated).
+     * 3. The original loaded book (now stale) attempts to save.
+     * 4. Expects {@link AggregateRootIsStale} exception.
+     * </p>
+     */
     def 'persistence in real database should work'() {
         given:
             AvailableBook availableBook = circulatingAvailableBookAt(bookId, libraryBranchId)

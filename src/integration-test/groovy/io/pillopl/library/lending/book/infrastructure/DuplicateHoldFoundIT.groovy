@@ -27,6 +27,14 @@ import static io.pillopl.library.lending.patron.model.PatronFixture.anyPatronId
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @SpringBootTest(classes = [LendingTestContext.class, DomainEventsTestConfig.class])
+/**
+ * Integration test verifying system behavior when a duplicate hold is detected.
+ * <p>
+ * This test simulates a race condition or user error where a book is placed on hold by two different patrons.
+ * It verifies that a compensating action (or rejection) occurs, ensuring that only one patron effectively holds the book
+ * or that the duplicate hold is handled correctly (e.g., by cancelling the second one).
+ * </p>
+ */
 class DuplicateHoldFoundIT extends Specification {
 
     PatronId patron = anyPatronId()
@@ -46,6 +54,17 @@ class DuplicateHoldFoundIT extends Specification {
 
     PollingConditions pollingConditions = new PollingConditions(timeout: 15)
 
+    /**
+     * Verifies reaction to a duplicate hold attempt.
+     * <p>
+     * Scenario:
+     * 1. A book exists.
+     * 2. Two patrons exist.
+     * 3. Both patrons attempt to place the same book on hold (events published).
+     * 4. The test asserts that the second patron (anotherPatron) ends up with zero holds,
+     *    indicating the system rejected or compensated for the duplicate hold.
+     * </p>
+     */
     def 'should react to compensation event - duplicate hold on book found'() {
         given:
             bookRepository.save(book)

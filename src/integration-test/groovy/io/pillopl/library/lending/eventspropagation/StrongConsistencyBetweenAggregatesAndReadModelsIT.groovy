@@ -29,6 +29,15 @@ import static io.pillopl.library.lending.patron.model.PatronFixture.regularPatro
 import static io.pillopl.library.lending.patron.model.PatronType.Regular
 
 @SpringBootTest(classes = LendingTestContext.class)
+/**
+ * Integration test verifying strong consistency between Aggregates and Read Models in synchronous scenarios.
+ * <p>
+ * Unlike {@link EventualConsistencyBetweenAggregatesAndReadModelsIT}, this test does not include
+ * {@code DomainEventsTestConfig.class}, implying that domain events are processed synchronously
+ * (e.g., in the same transaction or thread). It verifies that updates to the Write Model
+ * are immediately reflected in the Read Model.
+ * </p>
+ */
 class StrongConsistencyBetweenAggregatesAndReadModelsIT extends Specification {
 
     PatronId patronId = anyPatronId()
@@ -44,6 +53,18 @@ class StrongConsistencyBetweenAggregatesAndReadModelsIT extends Specification {
     @Autowired
     DataSource datasource
 
+    /**
+     * Verifies that Patron, Book, and DailySheet are synchronized immediately.
+     * <p>
+     * Scenario:
+     * 1. A book is saved and a patron is created.
+     * 2. The patron places the book on hold.
+     * 3. Assertions immediately check (without polling):
+     *    - The patron has the hold.
+     *    - The book is on hold.
+     *    - The daily sheet is updated.
+     * </p>
+     */
     def 'should synchronize Patron, Book and DailySheet with events'() {
         given:
             bookRepository.save(book)
